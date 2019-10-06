@@ -1,241 +1,301 @@
 <?php
+define('PORTABLE_UTF8__DISABLE_AUTO_FILTER', 1);
+require_once __DIR__ . '/vendor/autoload.php';
 // Check for form submit
 if (!isset($_POST['cmdEncode']) && !isset($_POST['cmdDecode'])) {
-  // User has not yet submitted
-  $_POST['chkBasics'] = true;
+    // User has not yet submitted
+    $_POST['chkBasics'] = true;
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-
 <head>
-  <title>Decoder - Encoder: UTF8, UTF16, ...</title>
+  <title>Decoder - Encoder: UTF-8, UTF-16, ...</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link href="css/styles.css" rel="stylesheet" type="text/css" />
-
 </head>
-
-<script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-4635324-7']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script');
-    ga.type = 'text/javascript';
-    ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(ga, s);
-  })();
-</script>
-
 <body>
-  <div id="header">
-    <div id="main">
-      <h1><u>De</u>code, <u>En</u>code or <u>Ob</u>fuscate your string</h1>
-      <p>This is used to obfuscate your string or code, to encode or decode a certain value.</p>
-      <hr />
-      <form method="post" action="index.php">
-        <p>Enter your string in the textarea below. Am I missing a popular technique? <a href="mailto:m@ttias.be">Let me know!</a></p>
-        <textarea name="txtCode" cols="80" rows="6"><?= isset($_POST['txtCode']) ? $_POST['txtCode'] : '' ?></textarea><br />
-        <input type="checkbox" name="chkBasics" id="chkBasics" <?= isset($_POST['chkBasics']) ? 'checked' : '' ?> /> <label for="chkBasics">Include basic encoding/decoding (HTML, UTF-8, base64, URL encode, ...)</label><br />
-        <input type="checkbox" name="chkOneWay" id="chkOneWay" <?= isset($_POST['chkOneWay']) ? 'checked' : '' ?> /> <label for="chkOneWay">Include one-way encryption (MD5, SHA1, RipeMD, Adler, Haval...)</label><br />
-        <input type="checkbox" name="chkObfuscate" id="chkObfuscate" <?= isset($_POST['chkObfuscate']) ? 'checked' : '' ?> /> <label for="chkObfuscate">Include code obfuscation (Javascript, SQL, HTML)</label><br />
-        <input type="submit" name="cmdEncode" value="Encode string" class="submit_button" /> <input type="submit" name="cmdDecode" value="Decode string" class="submit_button" />
-      </form>
+<div id="header">
+  <div id="main">
+    <h1><u>De</u>code, <u>En</u>code or <u>Ob</u>fuscate your string</h1>
+    <p>This is used to obfuscate your string or code, to encode or decode a certain value.</p>
+    <hr />
+    <form method="post" action="index.php">
+      <label for="txtCode">Enter your string in the textarea below.</label>
+      <textarea name="txtCode" id="txtCode" cols="80" rows="6"><?= $_POST['txtCode'] ?? '' ?></textarea><br />
+      <input type="checkbox" name="chkBasics" id="chkBasics" <?= isset($_POST['chkBasics']) ? 'checked' : '' ?> />
+      <label for="chkBasics">Include basic encoding/decoding (HTML, UTF-8, base64, URL encode, ...)</label><br />
+      <input type="checkbox" name="chkOneWay" id="chkOneWay" <?= isset($_POST['chkOneWay']) ? 'checked' : '' ?> />
+      <label for="chkOneWay">Include one-way encryption (MD5, SHA1, RipeMD, Adler, Haval...)</label><br />
+      <input type="checkbox" name="chkObfuscate" id="chkObfuscate" <?= isset($_POST['chkObfuscate']) ? 'checked' : '' ?> />
+      <label for="chkObfuscate">Include code obfuscation (Javascript, SQL, HTML)</label><br />
+      <input type="submit" name="cmdEncode" value="Encode string" class="submit_button" />
+      <input type="submit" name="cmdDecode" value="Decode string" class="submit_button" />
+    </form>
 
       <?php
       if (isset($_POST['cmdEncode']) && strlen($_POST['txtCode']) > 0) {
-        // Encode this string
-        $txtCode = $_POST['txtCode'];
+          // Encode this string
+          $txtCode = $_POST['txtCode'];
 
-        $arrCharCode = array();
-        $arrCharCodeSQL = array();
-        $arrCharCodeHexHtml = array();
-        $arrCharCodeDecHtml = array();
-        $arrCharCodeHexShortHtml = array();
-        for ($i = 0; $i < strlen($txtCode); $i++) {
-          $arrCharCode[]     = ord($txtCode[$i]);
-          $arrCharCodeSQL[]   = "CHAR(" . ord($txtCode[$i]) . ")";
-          $arrCharCodeHexHtml[]  = "&#x" . dechex(ord($txtCode[$i]));
-          $arrCharCodeDecHtml[]  = "&#" . ord($txtCode[$i]);
-          $arrCharCodeHexShortHtml[]  = "%" . dechex(ord($txtCode[$i]));
-        }
-
-        echo "<br /><h1>Encoding results</h1>\n\n";
-
-        if (isset($_POST['chkBasics'])) {
-          echo "<h1>Basic encoding</h1>\n";
-          // UTF-7
-          echo "<h2>UTF-7 encode</h2>\n";
-          echo "<xmp>" . imap_utf7_encode($txtCode) . "</xmp>\n\n";
-
-          // UTF-8
-          echo "<h2>UTF-8 encode</h2>\n";
-          echo "<xmp>" . utf8_encode($txtCode) . "</xmp>\n\n";
-
-          // UTF-16
-          echo "<h2>UTF-16 encode</h2>\n";
-          echo "<xmp>" . mb_convert_encoding($txtCode, "UTF-16", "auto") . "</xmp>\n\n";
-
-          // UTF-32
-          echo "<h2>UTF-32 encode</h2>\n";
-          echo "<xmp>" . mb_convert_encoding($txtCode, "UTF-32", "auto") . "</xmp>\n\n";
-
-          // rawurlencode
-          echo "<h2>RAW URL encode</h2>\n";
-          echo "<xmp>" . rawurlencode($txtCode) . "</xmp>\n\n";
-
-          // urlencode
-          echo "<h2>URL encode simple</h2>\n";
-          echo "<xmp>" . urlencode($txtCode) . "</xmp>\n\n";
-
-          // urlencode
-          echo "<h2>URL encode full</h2>\n";
-          echo "<xmp>" . implode("", $arrCharCodeHexShortHtml) . "</xmp>\n\n";
-
-          // HTML
-          echo "<h2>HTML encode</h2>\n";
-          echo "<xmp>" . htmlentities($txtCode) . "</xmp>\n\n";
-
-          // base64
-          echo "<h2>Base64 encode</h2>\n";
-          echo "<xmp>" . base64_encode($txtCode) . "</xmp>\n\n";
-
-          // uuencode
-          echo "<h2>UUencode</h2>\n";
-          echo "<xmp>" . convert_uuencode($txtCode) . "</xmp>\n\n";
-        }
-
-        if (isset($_POST['chkOneWay'])) {
-          echo "<h1>One way encryption</h1>\n";
-          foreach (hash_algos() as $hash_algo) {
-            echo "<h2>Hash: " . $hash_algo . "</h2>\n";
-            echo "<xmp>" . hash($hash_algo, $txtCode) . "</xmp>\n\n";
+          $arrCharCode = [];
+          $arrCharCodeSQL = [];
+          $arrCharCodeHexHtml = [];
+          $arrCharCodeDecHtml = [];
+          $arrCharCodeHexShortHtml = [];
+          foreach (\voku\helper\UTF8::chars($txtCode) as $char) {
+              $arrCharCode[] = \voku\helper\UTF8::ord($char);
+              $arrCharCodeSQL[] = "CHAR(" . \voku\helper\UTF8::ord($char) . ")";
+              $arrCharCodeHexHtml[] = "&#x" . dechex(\voku\helper\UTF8::ord($char));
+              $arrCharCodeDecHtml[] = "&#" . \voku\helper\UTF8::ord($char);
+              $arrCharCodeHexShortHtml[] = "%" . dechex(\voku\helper\UTF8::ord($char));
           }
-        }
 
-        if (isset($_POST['chkObfuscate'])) {
-          echo "<h1>Obfuscation: JavaScript</h1>\n";
-          // String.fromCharCode() in Javascript
-          echo "<h2>fromCharCode()</h2>\n";
-          echo "<xmp>document.write(String.fromCharCode(" . implode(",", $arrCharCode) . "));</xmp>\n\n";
+          echo "<br /><h1>Encoding results</h1>\n\n";
 
-          // unescape() in Javascript
-          echo "<h2>unescape()</h2>\n";
-          echo "<xmp>document.write(unescape(\"" . implode("", $arrCharCodeHexShortHtml) . "\"));</xmp>\n\n";
+          if (isset($_POST['chkBasics'])) {
+              echo "<h1>Basic encoding</h1>\n";
 
-          echo "<h1>Obfuscation: SQL</h1>\n";
-          // concat() char's
-          echo "<h2>CONTACT of CHAR()'s</h2>\n";
-          echo "<xmp>CONCAT(" . implode(",", $arrCharCodeSQL) . ")</xmp>\n\n";
+              // UTF-7
+              echo "<h2>Modified UTF-7 encode (imap_utf7_encode)</h2>\n";
+              echo "<xmp>" . imap_utf7_encode($txtCode) . "</xmp>\n\n";
 
-          // char()
-          echo "<h2>CHAR()</h2>\n";
-          echo "<xmp>CHAR(" . implode(",", $arrCharCode) . ")</xmp>\n\n";
+              // UTF-7
+              echo "<h2>UTF-7 encode (UTF8::encode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::encode('UTF-7', $txtCode) . "</xmp>\n\n";
 
-          echo "<h1>Obfuscation: HTML</h1>\n";
-          // hexadecimal
-          echo "<h2>HTML Hexadecimal with optional semicolons</h2>\n";
-          echo "<xmp>" . implode(";", $arrCharCodeHexHtml) . ";</xmp>\n\n";
+              // UTF-8
+              echo "<h2>Encodes an ISO-8859-1 string to UTF-8 (utf8_encode)</h2>\n";
+              echo "<xmp>" . utf8_encode($txtCode) . "</xmp>\n\n";
 
-          // decimal
-          echo "<h2>HTML Decimal with optional semicolons</h2>\n";
-          echo "<xmp>" . implode(";", $arrCharCodeDecHtml) . ";</xmp>\n\n";
-        }
+              // UTF-8
+              echo "<h2>Encodes an ISO-8859-1 string to UTF-8 (UTF8::utf8_encode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::utf8_encode($txtCode) . "</xmp>\n\n";
+
+              // UTF-8
+              echo "<h2>UTF-8 encode (UTF8::encode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::encode('UTF-8', $txtCode) . "</xmp>\n\n";
+
+              // UTF-16
+              echo "<h2>UTF-16 encode (mb_convert_encoding)</h2>\n";
+              echo "<xmp>" . mb_convert_encoding($txtCode, "UTF-16", "auto") . "</xmp>\n\n";
+
+              // UTF-16
+              echo "<h2>UTF-16 encode (UTF8::encode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::encode('UTF-16', $txtCode) . "</xmp>\n\n";
+
+              // UTF-32
+              echo "<h2>UTF-32 encode (mb_convert_encoding)</h2>\n";
+              echo "<xmp>" . mb_convert_encoding($txtCode, "UTF-32", "auto") . "</xmp>\n\n";
+
+              // UTF-32
+              echo "<h2>UTF-32 encode (UTF8::encode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::encode('UTF-32', $txtCode) . "</xmp>\n\n";
+
+              // rawurlencode
+              echo "<h2>RAW URL encode (rawurlencode)</h2>\n";
+              echo "<xmp>" . rawurlencode($txtCode) . "</xmp>\n\n";
+
+              // urlencode
+              echo "<h2>URL encode simple (urlencode)</h2>\n";
+              echo "<xmp>" . urlencode($txtCode) . "</xmp>\n\n";
+
+              // urlencode
+              echo "<h2>URL encode full</h2>\n";
+              echo "<xmp>" . implode("", $arrCharCodeHexShortHtml) . "</xmp>\n\n";
+
+              // HTML
+              echo "<h2>HTML encode (htmlentities)</h2>\n";
+              /** @noinspection NonSecureHtmlentitiesUsageInspection */
+              echo "<xmp>" . htmlentities($txtCode) . "</xmp>\n\n";
+
+              // HTML
+              echo "<h2>HTML encode (UTF8::htmlentities)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::htmlentities($txtCode) . "</xmp>\n\n";
+
+              // base64
+              echo "<h2>Base64 encode (base64_encode)</h2>\n";
+              echo "<xmp>" . base64_encode($txtCode) . "</xmp>\n\n";
+
+              // uuencode
+              echo "<h2>UUencode (convert_uuencode)</h2>\n";
+              echo "<xmp>" . convert_uuencode($txtCode) . "</xmp>\n\n";
+          }
+
+          if (isset($_POST['chkOneWay'])) {
+              echo "<h1>One way encryption</h1>\n";
+              foreach (hash_algos() as $hash_algo) {
+                  echo "<h2>Hash: " . $hash_algo . "</h2>\n";
+                  echo "<xmp>" . hash($hash_algo, $txtCode) . "</xmp>\n\n";
+              }
+          }
+
+          if (isset($_POST['chkObfuscate'])) {
+              echo "<h1>Obfuscation: JavaScript</h1>\n";
+              // String.fromCharCode() in Javascript
+              echo "<h2>fromCharCode()</h2>\n";
+              echo "<xmp>document.write(String.fromCharCode(" . implode(",", $arrCharCode) . "));</xmp>\n\n";
+
+              // unescape() in Javascript
+              echo "<h2>unescape()</h2>\n";
+              echo "<xmp>document.write(unescape(\"" . implode("", $arrCharCodeHexShortHtml) . "\"));</xmp>\n\n";
+
+              echo "<h1>Obfuscation: SQL</h1>\n";
+              // concat() char's
+              echo "<h2>CONTACT of CHAR()'s</h2>\n";
+              echo "<xmp>CONCAT(" . implode(",", $arrCharCodeSQL) . ")</xmp>\n\n";
+
+              // char()
+              echo "<h2>CHAR()</h2>\n";
+              echo "<xmp>CHAR(" . implode(",", $arrCharCode) . ")</xmp>\n\n";
+
+              echo "<h1>Obfuscation: HTML</h1>\n";
+              // hexadecimal
+              echo "<h2>HTML Hexadecimal with optional semicolons</h2>\n";
+              echo "<xmp>" . implode(";", $arrCharCodeHexHtml) . ";</xmp>\n\n";
+
+              // decimal
+              echo "<h2>HTML Decimal with optional semicolons</h2>\n";
+              echo "<xmp>" . implode(";", $arrCharCodeDecHtml) . ";</xmp>\n\n";
+          }
       } elseif (isset($_POST['cmdDecode']) && strlen($_POST['txtCode']) > 0) {
-        // Decode this string
-        $txtCode = $_POST['txtCode'];
+          // Decode this string
+          $txtCode = $_POST['txtCode'];
 
-        if (isset($_POST['chkBasics'])) {
-          echo "<h1>Basic encoding</h1>\n";
-          // UTF-7
-          echo "<h2>UTF-7 decoded</h2>\n";
-          echo "<xmp>" . imap_utf7_decode($txtCode) . "</xmp>\n\n";
+          if (isset($_POST['chkBasics'])) {
+              echo "<h1>Basic encoding</h1>\n";
 
-          // UTF-8
-          echo "<h2>UTF-8 decoded</h2>\n";
-          echo "<xmp>" . utf8_decode($txtCode) . "</xmp>\n\n";
+              // ASCII
+              echo "<h2>Converting into ASCII (UTF8::to_ascii)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::to_ascii($txtCode) . "</xmp>\n\n";
 
-          // UTF-16
-          echo "<h2>UTF-16 decoded to UTF-8</h2>\n";
-          echo "<xmp>" . mb_convert_encoding($txtCode, "UTF-8", array("UTF-16")) . "</xmp>\n\n";
+              // UTF-7
+              echo "<h2>Modified UTF-7 decoded (imap_utf7_decode)</h2>\n";
+              echo "<xmp>" . imap_utf7_decode($txtCode) . "</xmp>\n\n";
 
-          // UTF-32
-          echo "<h2>UTF-32 decoded to UTF-8</h2>\n";
-          echo "<xmp>" . mb_convert_encoding($txtCode, "UTF-8", array("UTF-32")) . "</xmp>\n\n";
+              // UTF-7
+              echo "<h2>UTF-7 decoded (UTF8::encode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::encode('UTF-8', $txtCode, 'UTF-7') . "</xmp>\n\n";
 
-          // rawurlencode
-          echo "<h2>RAW URL decoded</h2>\n";
-          echo "<xmp>" . rawurldecode($txtCode) . "</xmp>\n\n";
+              // UTF-8
+              echo "<h2>Decodes a UTF-8 string to ISO-8859-1 (utf8_decode)</h2>\n";
+              echo "<xmp>" . utf8_decode($txtCode) . "</xmp>\n\n";
 
-          // urlencode
-          echo "<h2>URL encode</h2>\n";
-          echo "<xmp>" . urlencode($txtCode) . "</xmp>\n\n";
+              // UTF-8
+              echo "<h2>Decodes a UTF-8 string to ISO-8859-1 (UTF8::utf8_decode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::utf8_decode($txtCode) . "</xmp>\n\n";
 
-          // HTML
-          echo "<h2>HTML entities decoded</h2>\n";
-          echo "<xmp>" . html_entity_decode($txtCode) . "</xmp>\n\n";
+              // UTF-8
+              echo "<h2>Converting almost all non-UTF-8 to UTF-8 (UTF8::to_utf8)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::to_utf8($txtCode) . "</xmp>\n\n";
 
-          // base64
-          echo "<h2>Base64 decoded</h2>\n";
-          echo "<xmp>" . base64_decode($txtCode) . "</xmp>\n\n";
+              // UTF-8
+              echo "<h2>Fix a double (or multiple) encoded UTF-8 string (UTF8::fix_utf8)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::fix_utf8($txtCode) . "</xmp>\n\n";
 
-          // uuencode
-          echo "<h2>UUdecoded</h2>\n";
-          echo "<xmp>" . convert_uudecode($txtCode) . "</xmp>\n\n";
-        }
+              // UTF-8
+              echo "<h2>Try to fix simple broken UTF-8 strings (UTF8::fix_simple_utf8)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::fix_simple_utf8($txtCode) . "</xmp>\n\n";
+
+              // UTF-16
+              echo "<h2>UTF-16 decoded to UTF-8 (mb_convert_encoding)</h2>\n";
+              echo "<xmp>" . mb_convert_encoding($txtCode, "UTF-8", ["UTF-16"]) . "</xmp>\n\n";
+
+              // UTF-16
+              echo "<h2>UTF-16 decoded to UTF-8 (UTF8::encode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::encode('UTF-8', $txtCode, false, 'UTF-16') . "</xmp>\n\n";
+
+              // UTF-32
+              echo "<h2>UTF-32 decoded to UTF-8 (mb_convert_encoding)</h2>\n";
+              echo "<xmp>" . mb_convert_encoding($txtCode, "UTF-8", ["UTF-32"]) . "</xmp>\n\n";
+
+              // UTF-32
+              echo "<h2>UTF-32 decoded to UTF-8 (UTF8::encode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::encode('UTF-8', $txtCode, false, 'UTF-32') . "</xmp>\n\n";
+
+              // rawurlencode
+              echo "<h2>RAW URL decoded (rawurldecode)</h2>\n";
+              echo "<xmp>" . rawurldecode($txtCode) . "</xmp>\n\n";
+
+              // rawurlencode
+              echo "<h2>Multi RAW URL + HTML entity decoded + fix urlencoded-win1252-chars (UTF8::rawurldecode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::rawurldecode($txtCode) . "</xmp>\n\n";
+
+              // urlencode
+              echo "<h2>URL encode (urlencode)</h2>\n";
+              echo "<xmp>" . urlencode($txtCode) . "</xmp>\n\n";
+
+              // HTML
+              echo "<h2>HTML entities decoded (html_entity_decode)</h2>\n";
+              echo "<xmp>" . html_entity_decode($txtCode) . "</xmp>\n\n";
+
+              // HTML
+              echo "<h2>HTML entities decoded + decode also numeric & UTF16 two byte entities (UTF8::html_entity_decode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::html_entity_decode($txtCode) . "</xmp>\n\n";
+
+              // base64
+              echo "<h2>Base64 decoded (base64_decode)</h2>\n";
+              echo "<xmp>" . base64_decode($txtCode) . "</xmp>\n\n";
+
+              // uuencode
+              echo "<h2>UUdecoded (convert_uudecode)</h2>\n";
+              echo "<xmp>" . convert_uudecode($txtCode) . "</xmp>\n\n";
+          }
       }
       ?>
-    </div>
-
-    <div id="footer">
-      String decoder &amp; encoder | Created by <a href="https://ma.ttias.be" target="_blank">Mattias Geniar</a> | Source on <a href="https://github.com/mattiasgeniar/Encoder" target="_blank">Github</a>
-    </div>
   </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
-  <script>
-    (function() {
-      // Make copy button for all xmp tags
-      var xmps = document.getElementsByTagName('xmp');
 
-      for (var count = 0; count < xmps.length; count++) {
-        var id = 'copy-' + count;
+  <div id="footer">
+    String decoder &amp; encoder
+    |
+    Demo for <a href="https://github.com/voku/portable-utf8" target="_blank">Portable-UTF8</a>
+    |
+    Source of this demo on <a href="https://github.com/voku/Encoder" target="_blank">Github</a>
+  </div>
+</div>
+<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+<!--suppress CheckValidXmlInScriptTagBody -->
+<script type="application/javascript">
+  (function() {
+    // Make copy button for all xmp tags
+    var xmps = document.getElementsByTagName('xmp');
 
-        var xmp = xmps[count];
-        xmp.id = id;
+    for (var count = 0; count < xmps.length; count++) {
+      var id = 'copy-' + count;
 
-        var button = document.createElement('a');
-        button.setAttribute("data-clipboard-target", "#" + id);
-        button.innerText = 'Copy text';
+      var xmp = xmps[count];
+      xmp.id  = id;
 
-        var title = xmp.previousElementSibling;
-        title.appendChild(button);
-      }
+      var button = document.createElement('a');
+      button.setAttribute("data-clipboard-target", "#" + id);
+      button.innerText = 'Copy text';
 
-      var clipboard = new Clipboard('a[data-clipboard-target]');
+      var title = xmp.previousElementSibling;
+      title.appendChild(button);
+    }
 
-      clipboard.on('success', function(e) {
-        var trigger = e.trigger;
-        trigger.innerText = 'Copied!';
+    var clipboard = new Clipboard('a[data-clipboard-target]');
 
-        setTimeout(function() {
-          trigger.innerText = 'Copy text';
-        }, 2000);
+    clipboard.on('success', function(e) {
+      var trigger       = e.trigger;
+      trigger.innerText = 'Copied!';
 
-        e.clearSelection();
-      });
+      setTimeout(function() {
+        trigger.innerText = 'Copy text';
+      }, 2000);
 
-      clipboard.on('error', function(e) {
-        var trigger = e.trigger;
-        trigger.innerText = 'Press Ctrl+c or Cmd+c to copy.';
-        setTimeout(function() {
-          trigger.innerText = 'Copy text';
-        }, 2000);
-      });
-    }());
-  </script>
+      e.clearSelection();
+    });
+
+    clipboard.on('error', function(e) {
+      var trigger       = e.trigger;
+      trigger.innerText = 'Press Ctrl+c or Cmd+c to copy.';
+      setTimeout(function() {
+        trigger.innerText = 'Copy text';
+      }, 2000);
+    });
+  }());
+</script>
 </body>
 
 </html>
