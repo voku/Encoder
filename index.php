@@ -22,7 +22,7 @@ if (!isset($_POST['cmdEncode']) && !isset($_POST['cmdDecode'])) {
     <hr />
     <form method="post" action="index.php">
       <label for="txtCode">Enter your string in the textarea below.</label>
-      <textarea name="txtCode" id="txtCode" cols="80" rows="6"><?= $_POST['txtCode'] ?? '' ?></textarea><br />
+      <textarea name="txtCode" id="txtCode" cols="80" rows="6"><?= $_POST['txtCode'] ?? 'ABC | öäü | Iñtërnâtiônàlizætiøn | &#20013;&#25991;&#31354;&#30333; | FÃÂÂÂÂ©dÃÂÂÂÂ©ration | DÃ¼sseldorf' ?></textarea><br />
       <input type="checkbox" name="chkBasics" id="chkBasics" <?= isset($_POST['chkBasics']) ? 'checked' : '' ?> />
       <label for="chkBasics">Include basic encoding/decoding (HTML, UTF-8, base64, URL encode, ...)</label><br />
       <input type="checkbox" name="chkOneWay" id="chkOneWay" <?= isset($_POST['chkOneWay']) ? 'checked' : '' ?> />
@@ -116,6 +116,10 @@ if (!isset($_POST['cmdEncode']) && !isset($_POST['cmdDecode'])) {
               // base64
               echo "<h2>Base64 encode (base64_encode)</h2>\n";
               echo "<xmp>" . base64_encode($txtCode) . "</xmp>\n\n";
+
+              // base64
+              echo "<h2>Base64 encode (UTF8::encode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::encode('BASE64', $txtCode) . "</xmp>\n\n";
 
               // uuencode
               echo "<h2>UUencode (convert_uuencode)</h2>\n";
@@ -248,7 +252,7 @@ if (!isset($_POST['cmdEncode']) && !isset($_POST['cmdDecode'])) {
   <div id="footer">
     String decoder &amp; encoder
     |
-    Demo for <a href="https://github.com/voku/portable-utf8" target="_blank">Portable-UTF8</a>
+    Demo for <a href="https://github.com/voku/portable-utf8" target="_blank">🉑 Portable UTF-8</a>
     |
     Source of this demo on <a href="https://github.com/voku/Encoder" target="_blank">Github</a>
   </div>
