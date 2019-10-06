@@ -22,7 +22,7 @@ if (!isset($_POST['cmdEncode']) && !isset($_POST['cmdDecode'])) {
     <hr />
     <form method="post" action="index.php">
       <label for="txtCode">Enter your string in the textarea below.</label>
-      <textarea name="txtCode" id="txtCode" cols="80" rows="6"><?= $_POST['txtCode'] ?? 'ABC | öäü | Iñtërnâtiônàlizætiøn | &#20013;&#25991;&#31354;&#30333; | FÃÂÂÂÂ©dÃÂÂÂÂ©ration | DÃ¼sseldorf' ?></textarea><br />
+      <textarea name="txtCode" id="txtCode" cols="80" rows="6"><?= $_POST['txtCode'] ?? '&#20013;&#25991;&#31354;&#30333; | FÃÂÂÂÂ©dÃÂÂÂÂ©ration | DÃ¼sseldorf | %25e1%2583%25a1%25e1%2583%2590%25e1%2583%25a5%25e1%2583%2590%25e1%2583%25a0%25e1%2583%2597%25e1%2583%2595%25e1%2583%2594%25e1%2583%259a%25e1%2583%259d' ?></textarea><br />
       <input type="checkbox" name="chkBasics" id="chkBasics" <?= isset($_POST['chkBasics']) ? 'checked' : '' ?> />
       <label for="chkBasics">Include basic encoding/decoding (HTML, UTF-8, base64, URL encode, ...)</label><br />
       <input type="checkbox" name="chkOneWay" id="chkOneWay" <?= isset($_POST['chkOneWay']) ? 'checked' : '' ?> />
