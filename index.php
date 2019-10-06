@@ -29,6 +29,8 @@ if (!isset($_POST['cmdEncode']) && !isset($_POST['cmdDecode'])) {
       <label for="chkOneWay">Include one-way encryption (MD5, SHA1, RipeMD, Adler, Haval...)</label><br />
       <input type="checkbox" name="chkObfuscate" id="chkObfuscate" <?= isset($_POST['chkObfuscate']) ? 'checked' : '' ?> />
       <label for="chkObfuscate">Include code obfuscation (Javascript, SQL, HTML)</label><br />
+      <input type="checkbox" name="chkStringBasics" id="chkStringBasics" <?= isset($_POST['chkStringBasics']) ? 'checked' : '' ?> />
+      <label for="chkStringBasics">Include string function results (strtolower, strlen, ...)</label><br />
       <input type="submit" name="cmdEncode" value="Encode string" class="submit_button" />
       <input type="submit" name="cmdDecode" value="Decode string" class="submit_button" />
     </form>
@@ -113,6 +115,10 @@ if (!isset($_POST['cmdEncode']) && !isset($_POST['cmdDecode'])) {
               echo "<h2>HTML encode (UTF8::htmlentities)</h2>\n";
               echo "<xmp>" . \voku\helper\UTF8::htmlentities($txtCode) . "</xmp>\n\n";
 
+              // HTML
+              echo "<h2>HTML encode (UTF8::html_encode)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::html_encode($txtCode) . "</xmp>\n\n";
+
               // base64
               echo "<h2>Base64 encode (base64_encode)</h2>\n";
               echo "<xmp>" . base64_encode($txtCode) . "</xmp>\n\n";
@@ -161,6 +167,95 @@ if (!isset($_POST['cmdEncode']) && !isset($_POST['cmdDecode'])) {
               // decimal
               echo "<h2>HTML Decimal with optional semicolons</h2>\n";
               echo "<xmp>" . implode(";", $arrCharCodeDecHtml) . ";</xmp>\n\n";
+          }
+
+          if (isset($_POST['chkStringBasics'])) {
+              echo "<h1>String: Function Examples</h1>\n";
+
+              // strlen
+              echo "<h2>String length (strlen)</h2>\n";
+              echo "<xmp>" . strlen($txtCode) . "</xmp>\n\n";
+
+              // strlen
+              echo "<h2>String length (UTF8::strlen)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::strlen($txtCode) . "</xmp>\n\n";
+
+              // strtolower
+              echo "<h2>String to lower (strtolower)</h2>\n";
+              echo "<xmp>" . strtolower($txtCode) . "</xmp>\n\n";
+
+              // strtolower
+              echo "<h2>String to lower (UTF8::strtolower)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::strtolower($txtCode) . "</xmp>\n\n";
+
+              // strtoupper
+              echo "<h2>String to upper (strtoupper)</h2>\n";
+              echo "<xmp>" . strtoupper($txtCode) . "</xmp>\n\n";
+
+              // strtoupper
+              echo "<h2>String to upper (UTF8::strtoupper)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::strtoupper($txtCode) . "</xmp>\n\n";
+
+              // substr
+              echo "<h2>Get part of a string. [e.g. 0-5] (substr)</h2>\n";
+              echo "<xmp>" . substr($txtCode, 0, 5) . "</xmp>\n\n";
+
+              // substr
+              echo "<h2>Get part of a string. [e.g. 0-5] (UTF8::substr)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::substr($txtCode, 0, 5) . "</xmp>\n\n";
+
+              // lcfirst
+              echo "<h2>Make a string's first character lowercase (lcfirst)</h2>\n";
+              echo "<xmp>" . lcfirst($txtCode) . "</xmp>\n\n";
+
+              // lcfirst
+              echo "<h2>Make a string's first character lowercase (UTF8::lcfirst)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::lcfirst($txtCode) . "</xmp>\n\n";
+
+              // ucfirst
+              echo "<h2>Make a string's first character uppercase (ucfirst)</h2>\n";
+              echo "<xmp>" . ucfirst($txtCode) . "</xmp>\n\n";
+
+              // ucfirst
+              echo "<h2>Make a string's first character uppercase (UTF8::ucfirst)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::ucfirst($txtCode) . "</xmp>\n\n";
+
+              // str_camelize
+              echo "<h2>String to camel case (UTF8::str_camelize)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::str_camelize($txtCode) . "</xmp>\n\n";
+
+              // str_snakeize
+              echo "<h2>String to snake case (UTF8::str_snakeize)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::str_snakeize($txtCode) . "</xmp>\n\n";
+
+              // str_dasherize
+              echo "<h2>String separated by dashes (UTF8::str_dasherize)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::str_dasherize($txtCode) . "</xmp>\n\n";
+
+              // str_underscored
+              echo "<h2>String separated by underscores (UTF8::str_underscored)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::str_underscored($txtCode) . "</xmp>\n\n";
+
+              // str_titleize
+              echo "<h2>String capitalized each word (UTF8::str_titleize)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::str_titleize($txtCode) . "</xmp>\n\n";
+
+              // str_truncate_safe
+              echo "<h2>Truncates the string [e.g. 5 chars] (UTF8::str_truncate_safe)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::str_truncate_safe($txtCode, 5) . "</xmp>\n\n";
+
+              // str_word_count
+              echo "<h2>Get the number of words in a specific string. (UTF8::str_word_count)</h2>\n";
+              echo "<xmp>" . \voku\helper\UTF8::str_word_count($txtCode) . "</xmp>\n\n";
+
+              // count_chars
+              echo "<h2>Returns count of characters used in a string. (UTF8::count_chars)</h2>\n";
+              echo "<xmp>" . print_r(\voku\helper\UTF8::count_chars($txtCode), true) . "</xmp>\n\n";
+
+              // codepoints
+              echo "<h2>Get an array of Unicode code points. (UTF8::codepoints)</h2>\n";
+              echo "<xmp>" . print_r(\voku\helper\UTF8::codepoints($txtCode), true) . "</xmp>\n\n";
+
           }
       } elseif (isset($_POST['cmdDecode']) && strlen($_POST['txtCode']) > 0) {
           // Decode this string
